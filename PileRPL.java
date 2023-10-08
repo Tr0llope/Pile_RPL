@@ -35,10 +35,10 @@ public class PileRPL{
 		}
 	}
 
-	public int pop(){
-		int res=0;
+	public ObjEmp pop(){
+		ObjEmp res = null;
 		if (!isEmpty()){ 
-			res = tab[nbObj-1].valeur;
+			res = tab[nbObj-1];
 			nbObj-=1;
 		}
 		else{	
@@ -52,9 +52,7 @@ public class PileRPL{
 			ObjEmp o1 = this.pop();
 			ObjEmp o2 = this.pop();
 			
-			int [] res = o1.add(o2);
-			
-			ObjEmp res = new ObjEmp();
+			ObjEmp res = o1.add(o2);
 			this.push(res);
 		} else {
 			System.out.println("Trop peu d'arguments !");
@@ -62,11 +60,15 @@ public class PileRPL{
 	}
 
 	public String toString(){
-		String affichage="";
-		for(int i=0;i<nbObj;i++){
-			String elem = Integer.toString(tab[i].entier);
-			affichage+="	* " + elem;
-			affichage+= new String(new char[3-elem.length()]).replace("\0", " ") +  "*\n";
+		String affichage="	******\n";
+		if(nbObj==0){
+			affichage+="	Pile vide\n";
+		}else{
+			for(int i=0;i<nbObj;i++){
+				String elem = tab[i].toString();
+				affichage+="	* " + elem;
+				affichage+= new String(new char[Math.max(0,3-elem.length())]).replace("\0", " ") +  "*\n";
+			}
 		}
 		affichage+="	******\n";
 		return affichage; 
