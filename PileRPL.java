@@ -1,6 +1,3 @@
-import java.lang.*;
-import java.io.*;
-
 public class PileRPL{
 	private int nbObj;
 	private static final int NB_OBJ_MAX=10;
