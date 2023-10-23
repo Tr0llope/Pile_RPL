@@ -17,27 +17,45 @@ public class ObjEmp{
 		this.taille=3;
 	}
 
-	public ObjEmp add(ObjEmp o2){
+	public ObjEmp ope(ObjEmp o2, String type){
 		int len = Math.max(this.taille, o2.taille);
-		int [] somme = new int[len];
+		int [] res = new int[len];
 		 
 		try{
-			for(int i=0;i<len;i++){
-				somme[i]=this.valeurs[i] + o2.valeurs[i];
+		switch(type){
+			case "add":
+				for(int i=0;i<len;i++){
+					res[i]=this.valeurs[i] + o2.valeurs[i];
+				}
+				break;
+				
+			case "sub":
+				for(int i=0;i<len;i++){
+					res[i]=this.valeurs[i] - o2.valeurs[i];
+				}
+				break;
+			case "mul":
+				for(int i=0;i<len;i++){
+					res[i]=this.valeurs[i] * o2.valeurs[i];
+				}
+				break;
+			case "div":
+				for(int i=0;i<len;i++){
+					res[i]=this.valeurs[i] / o2.valeurs[i];
+				}
+				break;
 			}
 		}catch(ArrayIndexOutOfBoundsException e){
-		System.out.println("Addition impossible !");
 		}
 
 		if(len==1){
-			return new ObjEmp(somme[0]);
+			return new ObjEmp(res[0]);
 		} else if(len==2){
-			return new ObjEmp(somme[0], somme[1]);
+			return new ObjEmp(res[0], res[1]);
 		} else {
-			return new ObjEmp(somme[0], somme[1], somme[2]);
+			return new ObjEmp(res[0], res[1], res[2]);
 		}
 	}
-
 
 	public String toString(){
 		String affichage = "(";
@@ -46,18 +64,5 @@ public class ObjEmp{
 		}
 		affichage+=this.valeurs[this.taille-1]+")";
 		return affichage;
-	}
-
-	public static void main(String [] args){
-		ObjEmp o1 = new ObjEmp(1, 2, 3);
-		ObjEmp o2 = new ObjEmp(4, 5, 6);
-		ObjEmp o3 = o1.add(o2);
-		System.out.println(o3);
-		ObjEmp o21 = new ObjEmp(1, 2);
-		ObjEmp o22 = new ObjEmp(4, 5);
-		ObjEmp o23 = o21.add(o22);
-		System.out.println(o23);
-		ObjEmp o33 = o21.add(o2);
-		System.out.println(o33);
 	}
 }

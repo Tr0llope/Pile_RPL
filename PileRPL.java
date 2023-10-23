@@ -19,7 +19,7 @@ public class PileRPL{
 	}
 
 	public boolean isFull(){
-		return tab.length==NB_OBJ_MAX;
+		return nbObj==NB_OBJ_MAX;
 	}
 
 	public void push(ObjEmp o){
@@ -44,12 +44,12 @@ public class PileRPL{
 		return res;
 	}
 
-	public void add(){
-		if(nbObj<=2){ 
+	public void ope(String type){
+		if(nbObj>=2){ 
 			ObjEmp o1 = this.pop();
 			ObjEmp o2 = this.pop();
 			
-			ObjEmp res = o1.add(o2);
+			ObjEmp res = o1.ope(o2, type);
 			this.push(res);
 		} else {
 			System.out.println("Trop peu d'arguments !");
@@ -57,36 +57,21 @@ public class PileRPL{
 	}
 
 	public String toString(){
-		String affichage="	******\n";
+		String affichage="	++-----------++\n";
 		if(nbObj==0){
-			affichage+="	Pile vide\n";
+			affichage+="	|| Pile vide ||\n";
 		}else{
 			for(int i=0;i<nbObj;i++){
 				String elem = tab[i].toString();
-				affichage+="	* " + elem;
-				affichage+= new String(new char[Math.max(0,3-elem.length())]).replace("\0", " ") +  "*\n";
+				affichage+="	|| " + elem;
+				for(int j = 0;j<(10-elem.length());j++){
+					affichage += " ";
+				}
+				affichage += "||\n";
 			}
 		}
-		affichage+="	******\n";
+		affichage+="	++-----------++\n";
 		return affichage; 
 	}
 
-	public static void main(String[] args){
-		ObjEmp o1 = new ObjEmp(5);
-		ObjEmp o2 = new ObjEmp(12);
-		ObjEmp o3 = new ObjEmp(6,4);
-		PileRPL pile = new PileRPL(5);
-		System.out.println(pile);
-		pile.push(o1);
-		System.out.println(pile);
-		pile.push(o2);
-		System.out.println(pile);
-		pile.add();
-		System.out.println(pile);
-		pile.push(o3);
-		System.out.println(pile);
-		pile.add();
-		System.out.println(pile);
-
-	}
 }

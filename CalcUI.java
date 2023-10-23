@@ -1,68 +1,125 @@
-import java.util.Scanner;
+import java.util.*;
+import java.io.*;
+import java.lang.*;
+import java.net.*;
 
 public class CalcUI {
-    
-    public void empiler(ObjEmp o){
+	boolean log_recording;
+	boolean log_playing;
+	public static InputStream ins;
+	public static PrintStream outs;
+	
+	public CalcUI(String[] args){
+		initStreams(args);
+		mainLoop();
+	}
+	
+	public void initStreams(String[] args){
+		boolean local = false;
+		boolean	remote = false;
+		for(String s: args){
+			switch(s){
+				case "local":
+					local = true;
+					break;
+				case "remote":
+					remote = true;
+					break;
+				case "log":
+					log_recording = true;
+					break;
+				case "replay":
+					log_playing = true;
+					break;
+			}
+		}
+		if(local) initFullLocal();
+		//if(remote) initFullRemote();
+		if(local && log_playing) initReplayLocal();
+		//if(remote && log_playing) initReplayRemote();
+		
+	}
+	
+	public void initFullLocal(){
+		ins = System.in;
+		outs = System.out;
+	}
+	/*public void initFullRemote(){
+		ServerSocket serversocket = new ServerSocket(4040);
+		Socket socket = serversocket.accept();
+		ins = socket.getInputStream();
+		outs = new PrintStream( socket.getOutputStream());
+	}
+	*/
+	public void initReplayLocal(){
+		try{ins = new FileInputStream("log.txt");}catch (Exception e){return;}
+		outs = System.out;
+	}
+	/*public void initReplayRemote(){
+		ServerSocket serversocket = new ServerSocket(4040);
+		Socket socket = serversocket.accept();
+		try{ins = new FileInputStream("log.txt");}catch (Exception e){return;}
+		outs = new PrintStream( socket.getOutputStream());
+	}*/
 
-    }
+	public void mainLoop(){
+		File logfile = null;
+		FileWriter flog = null;
+		BufferedWriter bufflog = null;
+		try{
+				if(log_recording){
+					logfile = new File("log.txt");
+					flog = new FileWriter(logfile.getAbsoluteFile());
+					bufflog = new BufferedWriter(flog);
+					outs.println("Logged Session !");
+				}
 
-    public void operation(){
+		outs.println("Bienvenue dans la calculatrice RPL !\n" + //
+				"Taille de la pile:");
+		Scanner sc = new Scanner(ins);
+		int taille = sc.nextInt();
+		
+		if(log_recording) bufflog.write(taille+"\n");
+		if(log_playing) outs.println(taille);
+		
+		PileRPL pile = new PileRPL(taille);
+	
+		String input = sc.nextLine();
+		while(!input.equals("quit")){
+		String[] command = input.split(" ");
+			
+			if(log_recording) bufflog.write(input+"\n");
+			if(log_playing) outs.println(input);
+			
+			for(int i = 0; i<command.length;i++){
+			switch(command[i]){
+				case "push":
+					i+=1;
+					ObjEmp o = new ObjEmp(Integer.parseInt(command[i]));
+					pile.push(o);
+					break;
 
-    }
+				case "add":
+					pile.ope("add");
+					break;
 
-    public static void main(String [] args){
-        System.out.println("Bienvenue dans la calculatrice RPL !\n" + //
-            "Pour voir les commandes disponibles, tapez 'commandes'.\n" + //
-            "Commencez par renseigner la taille de la pile:\n"
-            );
-        Scanner sc = new Scanner(System.in);
-        int taille = sc.nextInt();
-        PileRPL pile = new PileRPL(taille);
-        System.out.println("Pile créée.\n");
-
-        String input = sc.nextLine();
-        while(!input.equals("quitter")){
-            if(input.equals("empiler")){
-                System.out.println("Veuillez entrer la valeur à empiler sous la forme suivante: x, x y ou x y z.");
-                input = sc.nextLine();
-                String[] valeurs = input.split(" ");
-                if(valeurs.length==1){
-                    ObjEmp o = new ObjEmp(Integer.parseInt(valeurs[0]));
-                    pile.push(o);
-                } else if(valeurs.length==2){
-                    ObjEmp o = new ObjEmp(Integer.parseInt(valeurs[0]), Integer.parseInt(valeurs[1]));
-                    pile.push(o);
-                } else if(valeurs.length==3){
-                    ObjEmp o = new ObjEmp(Integer.parseInt(valeurs[0]), Integer.parseInt(valeurs[1]), Integer.parseInt(valeurs[2]));
-                    pile.push(o);
-                } else {
-                    System.out.println("Valeur invalide.");
-                }
-                System.out.println("Valeur empilée.");
-
-            } else if(input.equals("operation")){
-                pile.add();
-                System.out.println("Opération effectuée.");
-
-            } else if(input.equals("afficher")){
-                System.out.println(pile);
-
-            } else if(input.equals("commandes")){
-                System.out.println(
-                "Pour ajouter une opérande, tapez 'empiler'\n" + //
-                "Pour effectuer une opération, tapez 'operation'.\n" + //
-                "Pour afficher la pile, tapez 'afficher'.\n" + //
-                "Pour quitter, tapez 'quitter'." + //
-                "Pour avoir plus d'information concernant le fonctionnement de la pile, tapez 'help'"
-                );
-            } else if(input.equals("help")){
-              System.out.println("Cette calculatrice permet d'additionner des vecteurs de dimension 1, 2 ou 3.\n" + //
-                  "Il faut d'abord empiler les opérandes, puis effectuer l'opération.\n" + //
-                  "Exemple: empiler (1,2,3) puis empiler (4,5,6) puis operation.\n"); 
-            } else {
-                System.out.println("Commande invalide.");
-            }
-            input = sc.nextLine();
-        }
-    }
+				case "sub":
+					pile.ope("sub");
+					break;
+				case "mul":
+					pile.ope("mul");
+					break;
+				case "div":
+					pile.ope("div");
+					break;
+		}//fin switch
+		}//fin parcours input cmd
+		if(!pile.isEmpty()){
+			outs.println(pile);
+		}
+		input = sc.nextLine();
+	}
+	bufflog.close();
+	}catch (Exception e){return;}
+}
 }
