@@ -1,8 +1,5 @@
-import java.io.*;
-import java.util.*;
-
 public class Main {
-	public static void main(String[] args){
-		CalcUI calculatrice = new CalcUI(args);
+	public static void main(String[] args) throws Exception{
+		CalcLauncher calc = new CalcLauncher(args);
 	}
 }
