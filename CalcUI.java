@@ -81,8 +81,6 @@ public class CalcUI {
 		} 
 
 		while(!input.equals("quit")){
-		String[] command = input.split(" ");
-			
 			if(log_recording) bufflog.write(input+"\n");
 			if(log_playing) outs.println(input);
 			parser(input, pile);
