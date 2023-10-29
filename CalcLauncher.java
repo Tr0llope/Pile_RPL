@@ -1,22 +1,23 @@
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.*;
 
 public class CalcLauncher {
-    boolean log_recording;
-    boolean log_playing;
-    public static BufferedReader ins;
-    public static PrintStream outs;
+    private boolean log_recording;
+    private boolean log_playing;
+    private boolean share;
+    private BufferedReader ins;
+    private PrintStream outs;
+    private PileRPL pile;
 
     public CalcLauncher(String[] args) throws Exception {
         initStreams(args);
-        CalcUI calc = new CalcUI(ins, outs, log_playing, log_recording);
+        CalcUI calc = new CalcUI(ins, outs, log_playing, log_recording, pile, share);
     }
 
     	public void initStreams(String[] args) throws Exception{
 		boolean local = false;
 		boolean	remote = false;
-		for(String s: args){
+		for(String s: args){ 
 			switch(s){
 				case "local":
 					local = true;
@@ -30,6 +31,9 @@ public class CalcLauncher {
 				case "replay":
 					log_playing = true;
 					break;
+                case "share":
+                    share = true;
+                    break;
 			}
 		}
 		if(local && !log_playing) initFullLocal();
@@ -49,12 +53,13 @@ public void initFullRemote() throws IOException {
     try(ServerSocket serverSocket = new ServerSocket(2222);){
         while(true){
             Socket socket = serverSocket.accept();
+            if(!share) pile = new PileRPL();
             Thread t = new Thread(() -> {
                 try{
                     ins = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                     outs = new PrintStream(socket.getOutputStream());
                     outs.println("Connecté");
-                    Remote remote = new Remote(socket, ins, outs, log_playing, log_recording);
+                    Remote remote = new Remote(socket, ins, outs, log_playing, log_recording, pile, share);
                     remote.connect();
                 } catch (IOException e){
                     e.printStackTrace();
@@ -85,7 +90,7 @@ public void initReplayRemote() throws IOException {
                     ins = new BufferedReader(new InputStreamReader(new FileInputStream("log.txt")));
                     outs = new PrintStream(socket.getOutputStream());
                     outs.println("Replay");
-                    Remote remote = new Remote(socket, ins, outs, log_playing, log_recording);
+                    Remote remote = new Remote(socket, ins, outs, log_playing, log_recording, pile, share);
                     remote.connect();
                 } catch (IOException e){
                     e.printStackTrace();

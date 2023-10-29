@@ -2,17 +2,20 @@ import java.util.*;
 import java.io.*;
 
 public class CalcUI {
-	boolean log_recording;
-	boolean log_playing;
-	public BufferedReader ins;
-	public PrintStream outs;
-	PileRPL p;
+	private boolean log_recording;
+	private boolean log_playing;
+	private boolean share;
+	private BufferedReader ins;
+	private PrintStream outs;
+	private PileRPL pile;
 	
-	public CalcUI(BufferedReader ins, PrintStream outs, boolean log_playing, boolean log_recording) throws Exception{
+	public CalcUI(BufferedReader ins, PrintStream outs, boolean log_playing, boolean log_recording, PileRPL pile, boolean share) throws Exception{
 		this.ins = ins;
 		this.outs = outs;
 		this.log_playing = log_playing;
 		this.log_recording = log_recording;
+		this.pile = pile;
+		this.share = share;
 		mainLoop();
 	}
 	
@@ -36,7 +39,9 @@ public class CalcUI {
 						pile.push(o);
 					}
 					break;
-
+				case "pop":
+					pile.pop();
+					break;
 				case "add":
 					pile.ope("add");
 					break;
@@ -63,15 +68,17 @@ public class CalcUI {
 					logfile = new File("log.txt");
 					flog = new FileWriter(logfile.getAbsoluteFile());
 					bufflog = new BufferedWriter(flog);
-					outs.println("Logged Session !");
 				}
 
 		outs.println("Bienvenue dans la calculatrice RPL !\n" + //
 				"Taille de la pile:");
 		Scanner sc = new Scanner(ins);
-		String input = sc.nextLine();
-		int taille = Integer.parseInt(input);
-		PileRPL pile = new PileRPL(taille);
+		String input = "";
+		if(!share){
+			input = sc.nextLine();
+			int taille = Integer.parseInt(input);
+			pile = new PileRPL(taille);
+		} 
 
 		while(!input.equals("quit")){
 		String[] command = input.split(" ");

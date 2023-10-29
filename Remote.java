@@ -1,24 +1,28 @@
 import java.io.*;
 import java.net.Socket;
-import java.nio.Buffer;
 
 public class Remote {
-    public Socket socket;
-    public BufferedReader ins;
-    public PrintStream outs;
-    boolean log_recording;
-    boolean log_playing;
+    private Socket socket;
+    private BufferedReader ins;
+    private PrintStream outs;
+    private boolean log_recording;
+    private boolean log_playing;
+    private boolean share;
+    private PileRPL pile;
 
-    public Remote(Socket socket, BufferedReader ins, PrintStream outs, boolean log_playing, boolean log_recording) {
+    public Remote(Socket socket, BufferedReader ins, PrintStream outs, boolean log_playing, boolean log_recording, PileRPL pile, boolean share) {
         this.socket = socket;
         this.ins = ins;
         this.outs = outs;
         this.log_recording = log_recording;
         this.log_playing = log_playing;
+        this.pile = pile;
+        this.share = share;
+
     }
     public void connect() {
         try{
-            CalcUI calc = new CalcUI(ins, outs, log_playing, log_recording);
+            CalcUI calc = new CalcUI(ins, outs, log_playing, log_recording, pile, share);
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
